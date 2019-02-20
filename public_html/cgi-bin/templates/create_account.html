@@ -26,15 +26,15 @@
 
 </table><p>
 <h3>Create account</h3>
-<form action="#" method="post"><br>
+<form action="{{url_for('create_account')}}" method="post"><br>
 	Username
-	<input type="text"><br>
+	<input type="text" name="user"><br>
 	Password
-	<input type="password"><br>
+	<input type="password" name="password"><br>
 	Hometown
-	<input type="text"><br>
+	<input type="text" name="hometown"><br>
 
- <button type="button">Submit</button> 
+ <button type="submit">Submit</button> 
 
 </form>
 
