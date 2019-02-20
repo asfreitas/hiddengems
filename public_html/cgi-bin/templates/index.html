@@ -1,0 +1,43 @@
+{% extends "layout.html" %}
+
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+
+	<title>Hidden Gems</title>
+
+
+</head>
+<body >
+
+{% block body %}
+
+<h3>Login</h3>
+<form> 
+	Username
+	<input type="text"><br>
+	Password
+	<input type="password"><br>
+ <button type="button">Submit</button> 
+</form><p>
+
+<h3>Select City to Display Gems</h3>
+<form> 
+
+ <select name="cities">
+  <option value="volvo">Chicago</option>
+  <option value="saab">Paris</option>
+  <option value="fiat">Hanoi</option>
+  <option value="audi">Sydney</option>
+</select><br>
+ <button type="button">Submit</button> 
+</form>
+
+{% endblock %}
+
+</body>
+</html>

@@ -1,0 +1,46 @@
+{% extends "layout.html" %}
+
+
+
+{% block body %}
+
+<table>
+	<h3>Add Gem</h3>
+	<tr>
+	<th>ID</th>
+	<th>Address</th>
+	<th>Type</th>
+	<th>Name</th>
+	<th>Description</th>
+</tr>
+	<tr>
+		<td>1</td>
+	</tr>
+	<tr>
+		<td>2</td>
+	</tr>
+</table><p>
+
+
+<form action="#" method="post"><br>
+	Select City
+	 <select name="cities"><br>
+  <option value="volvo">Chicago</option>
+  <option value="saab">Paris</option>
+  <option value="fiat">Hanoi</option>
+  <option value="audi">Sydney</option>
+</select> <br>
+	Address
+	<input type="text"><br>
+ 	Gem Name
+	<input type="text"><br>
+ 	<input type="radio" name="" value=""> Gem Type 1<br>	
+	<input type="radio" name="" value=""> Gem Type 2<br>	
+	<input type="radio" name="" value=""> Gem Type 3<br>	
+	Description
+	<input type="text"><br>
+	 <button type="button">Submit</button> 
+</form>
+
+
+{% endblock %}
