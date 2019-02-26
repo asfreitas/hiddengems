@@ -7,8 +7,7 @@
 </head>
 <body>
 	<nav class="navbar navbar-expand-md navbar-dark bg-dark ">
-	<header class="navbar-brand">
-	<ul class="navbar-nav ">
+	<ul class="navbar-nav mr-auto mt-2 my-lg-0">
 		<li class="nav-item"> 
 			<a class="nav-link active" href="{{ url_for('index')}}">Home</a>
 			</li>
@@ -24,8 +23,18 @@
 		<li class="nav-item"> 
 			<a class="nav-link" href="{{url_for('reviews')}}">Reviews</a>
 			</li>
+		<li class="nav-item"> 
+			<a class="nav-link" href="{{url_for('login')}}">Login</a>
+			</li>
 	</ul>
-	</header>
+	<div>
+		<ul class="nav navbar-nav ml-auto text-white">
+			<li class="nav-item">Hello {{session.username}}</li>
+			<li class="nav-item">
+				<a class="nav-link" href="{{url_for('logout')}}">Logout</a>
+			</li>
+		</ul>
+	</div>
 </nav>
 		{% block body %}
 
