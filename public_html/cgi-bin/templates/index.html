@@ -21,10 +21,9 @@
 <form> 
 
  <select name="cities">
-  <option value="volvo">Chicago</option>
-  <option value="saab">Paris</option>
-  <option value="fiat">Hanoi</option>
-  <option value="audi">Sydney</option>
+ {% for item in name %}
+  <option value="0">{{ item.name }}</option>
+{% endfor %}
 </select><br>
  <button type="button">Submit</button> 
 </form>

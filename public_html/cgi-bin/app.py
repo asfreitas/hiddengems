@@ -17,7 +17,7 @@ app.secret_key = "hiddengems"
 #MYSQL: you'll have to change these when you want to use your
 # own MYSQL database on the oregon state servers
 app.config['MYSQL_DATABASE_USER'] = 'cs340_freitand'
-app.config['MYSQL_DATABASE_PASSWORD'] = ''
+app.config['MYSQL_DATABASE_PASSWORD'] = '3048'
 app.config['MYSQL_DATABASE_DB'] = 'cs340_freitand'
 app.config['MYSQL_DATABASE_HOST'] = 'classmysql.engr.oregonstate.edu'
 mysql.init_app(app)
@@ -30,7 +30,14 @@ mysql.init_app(app)
 @app.route("/")
 def index():
 
-	return render_template("index.html")
+	dbconn = mysql.connect()
+	cityDBCursor = dbconn.cursor(pymysql.cursors.DictCursor)
+
+	cityDBCursor.execute("SELECT name FROM Cities", args=None)
+	name = cityDBCursor.fetchall()
+	app.logger.info(name)
+
+	return render_template("index.html", name = name)
 
 
 @app.route("/add-city")
