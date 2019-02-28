@@ -33,7 +33,7 @@ def index():
 	dbconn = mysql.connect()
 	cityDBCursor = dbconn.cursor(pymysql.cursors.DictCursor)
 
-	cityDBCursor.execute("SELECT name FROM Cities", args=None)
+	cityDBCursor.execute("SELECT name, idCities FROM Cities", args=None)
 	name = cityDBCursor.fetchall()
 	app.logger.info(name)
 
