@@ -21,6 +21,7 @@
 <form> 
 
  <select name="cities">
+ 	<option value="#" selected="selected">Select City</option>
  {% for item in name %}
 
   <option value="{{ item.idCities }}">{{ item.name }}</option>
@@ -29,6 +30,18 @@
 </select><br>
  <button type="button">Submit</button> 
 </form>
+
+
+<table>
+	<tr>
+		<th>Name</th>
+		<th>Address</th>
+		<th>type</th>
+		<th>Description</th>
+		<th>Location</th>
+	</tr>
+
+</table>
 
 {% endblock %}
 

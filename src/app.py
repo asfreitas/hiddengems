@@ -17,7 +17,7 @@ app.secret_key = "hiddengems"
 #MYSQL: you'll have to change these when you want to use your
 # own MYSQL database on the oregon state servers
 app.config['MYSQL_DATABASE_USER'] = 'cs340_freitand'
-app.config['MYSQL_DATABASE_PASSWORD'] = ''
+app.config['MYSQL_DATABASE_PASSWORD'] = '3048'
 app.config['MYSQL_DATABASE_DB'] = 'cs340_freitand'
 app.config['MYSQL_DATABASE_HOST'] = 'classmysql.engr.oregonstate.edu'
 mysql.init_app(app)
@@ -27,7 +27,7 @@ mysql.init_app(app)
 
 
 
-@app.route("/")
+@app.route("/", methods=["GET", "POST"])
 def index():
 
 	dbconn = mysql.connect()
@@ -35,14 +35,33 @@ def index():
 
 	cityDBCursor.execute("SELECT name, idCities FROM Cities", args=None)
 	name = cityDBCursor.fetchall()
-	app.logger.info(name)
+
+	if request.method == "POST":
+		dbconn2 = mysql.connect()
+		
+
 
 	return render_template("index.html", name = name)
 
-
-@app.route("/add-city")
+@app.route("/add-city", methods=["GET", "POST"])
 def add_city():
-    return render_template("add_city.html")
+	if request.method == "POST":
+		city = request.form["city"]
+		latitude = request.form["latitude"]
+		longitude = request.form["longitude"]
+		state = request.form["state"]
+		country = request.form["country"]
+
+
+		dbconn = mysql.connect()
+		cityDBCursor = dbconn.cursor(pymysql.cursors.DictCursor)
+		insertQuery = "INSERT INTO Cities (name, latitude, longitude, state, country) VALUES (%s, %s, %s, %s, %s)"
+		cityInfo = (city, latitude, longitude, state, country)
+		cursor = dbconn.cursor()
+		cursor.execute(insertQuery, cityInfo)
+		dbconn.commit()
+		dbconn.close()
+	return render_template("add_city.html")
 
 @app.route('/reviews')
 def reviews():
@@ -72,7 +91,6 @@ def create_account():
 		cursor.execute(insertQuery, userInfo)
 		dbconn.commit()
 		dbconn.close()
-
 
 	return render_template("create_account.html")
 
