@@ -29,7 +29,6 @@ mysql.init_app(app)
 
 @app.route("/", methods=["GET", "POST"])
 def index():
-
 	dbconn = mysql.connect()
 	cityDBCursor = dbconn.cursor(pymysql.cursors.DictCursor)
 
@@ -38,8 +37,15 @@ def index():
 
 	if request.method == "POST":
 		dbconn2 = mysql.connect()
-		
+		cityDBCursor2 = dbconn2.cursor(pymysql.cursors.DictCursor)
 
+		city = request.form.get('cityid')
+		app.logger.info(city)
+		selectQuery = "SELECT address, type, Gems.name, description, Cities.name FROM Gems INNER JOIN Cities ON location = idCities WHERE idCities = %s"
+		cityDBCursor2.execute(selectQuery, city)
+		cityInfo = cityDBCursor2.fetchall()
+		app.logger.info(cityInfo)
+		return render_template("index.html", cityInfo = cityInfo)
 
 	return render_template("index.html", name = name)
 

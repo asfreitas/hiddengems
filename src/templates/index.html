@@ -18,17 +18,17 @@
 
 
 <h3>Select City to Display Gems</h3>
-<form> 
+<form method="POST"> 
 
  <select name="cities">
  	<option value="#" selected="selected">Select City</option>
  {% for item in name %}
 
-  <option value="{{ item.idCities }}">{{ item.name }}</option>
+  <option value = "{{ item.idCities }}" name="cityid">{{ item.name }}</option>
  
 {% endfor %}
 </select><br>
- <button type="button">Submit</button> 
+ <button type="submit">Submit</button> 
 </form>
 
 
@@ -40,7 +40,11 @@
 		<th>Description</th>
 		<th>Location</th>
 	</tr>
-
+	{% for item in cityInfo %}
+	<tr>
+		<td>item.address</td>
+	</tr>
+	{% endfor %}
 </table>
 
 {% endblock %}
