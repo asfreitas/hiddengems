@@ -23,20 +23,44 @@ app.config['MYSQL_DATABASE_HOST'] = 'classmysql.engr.oregonstate.edu'
 mysql.init_app(app)
 
 
-@app.route("/")
+@app.route("/", methods=["GET", "POST"])
 def index():
 	dbconn = mysql.connect()
 	cityDBCursor = dbconn.cursor(pymysql.cursors.DictCursor)
 
 	cityDBCursor.execute("SELECT name, idCities FROM Cities", args=None)
 	name = cityDBCursor.fetchall()
-	app.logger.info(name)
+
+	if request.method == "POST":
+		dbconn2 = mysql.connect()
+		cityDBCursor2 = dbconn2.cursor(pymysql.cursors.DictCursor)
+		cityInfo = request.form.get('city')
+		selectQuery = "SELECT address, type, Gems.name, description, Cities.name as cityname FROM Gems INNER JOIN Cities ON location = idCities WHERE idCities = %s"
+		cityDBCursor2.execute(selectQuery, (cityInfo))
+		cityInfo = cityDBCursor2.fetchall()
+		app.logger.info(cityInfo)
+		return render_template("index.html", cityInfo = cityInfo, name = name)
 
 	return render_template("index.html", name = name)
 
-@app.route("/add-city")
+@app.route("/add-city", methods=["GET", "POST"])
 def add_city():
-	dbconn = mysql.connect()
+	if request.method == "POST":
+		city = request.form["city"]
+		latitude = request.form["latitude"]
+		longitude = request.form["longitude"]
+		state = request.form["state"]
+		country = request.form["country"]
+
+
+		dbconn = mysql.connect()
+		cityDBCursor = dbconn.cursor(pymysql.cursors.DictCursor)
+		insertQuery = "INSERT INTO Cities (name, latitude, longitude, state, country) VALUES (%s, %s, %s, %s, %s)"
+		cityInfo = (city, latitude, longitude, state, country)
+		cursor = dbconn.cursor()
+		cursor.execute(insertQuery, cityInfo)
+		dbconn.commit()
+		dbconn.close()
 	return render_template("add_city.html")
 
 @app.route('/reviews')
