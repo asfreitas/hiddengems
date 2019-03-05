@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+<main>
+	<section>
+		<header>
+			<h2>{{ gem.name }}</h2>
+			<span>{{ gem.discoveredByUsername }}</span>
+		</header>
+		<p>{{ gem.description }}</p>
+	</section>
+</main>
+
+{% endblock %}
