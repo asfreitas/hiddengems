@@ -39,13 +39,12 @@ def index():
 		dbconn2 = mysql.connect()
 		cityDBCursor2 = dbconn2.cursor(pymysql.cursors.DictCursor)
 
-		city = request.form.get('cityid')
-		app.logger.info(city)
-		selectQuery = "SELECT address, type, Gems.name, description, Cities.name FROM Gems INNER JOIN Cities ON location = idCities WHERE idCities = %s"
-		cityDBCursor2.execute(selectQuery, city)
+		cityInfo = request.form.get('city')
+		selectQuery = "SELECT address, type, Gems.name, description, Cities.name as cityname FROM Gems INNER JOIN Cities ON location = idCities WHERE idCities = %s"
+		cityDBCursor2.execute(selectQuery, (cityInfo))
 		cityInfo = cityDBCursor2.fetchall()
 		app.logger.info(cityInfo)
-		return render_template("index.html", cityInfo = cityInfo)
+		return render_template("index.html", cityInfo = cityInfo, name = name)
 
 	return render_template("index.html", name = name)
 
