@@ -114,9 +114,47 @@ def gem_solo(gemId):
 		return render_tempalte("error.html", message = "Missing a gem id.")
 	else:
 		dbconn = mysql.connect()
+		cursor = dbconn.cursor(pymysql.cursors.DictCursor)
+
+		cursor.execute("""
+SELECT
+    `Gems`.`idGems`,
+    `Gems`.`name`,
+    `Gems`.`description`,
+    `Cities`.`name` AS `cityName`,
+    `Cities`.`idCities`,
+    `Users`.`username` AS `discoveredByUsername`,
+    COUNT(`Favorites`.`user`) AS `stars`
+FROM
+    `Gems`
+        LEFT JOIN
+    `Cities` ON `Gems`.`location` = `Cities`.`idCities`
+        LEFT JOIN
+    `Users` ON `Gems`.`created_by` = `Users`.`idUsers`
+        LEFT JOIN
+    `Favorites` ON `Gems`.`idGems` = `Favorites`.`gem`
+WHERE
+    `Gems`.`idGems` = %s
+GROUP BY `Gems`.`idGems`;
+		""", (gemId))
+		gem = cursor.fetchone()
+
+		cursor.execute("""
+SELECT
+    `Reviews`.`created`,
+    `Reviews`.`contents`,
+    `Users`.`username`
+FROM
+    `Reviews`
+        LEFT JOIN
+    `Users` ON `Users`.`idUsers` = `Reviews`.`written_by`
+WHERE
+    `Reviews`.`gem` = %s
+		""", (gemId))
+		reviews = cursor.fetchall()
 
 		dbconn.close()
-		return render_template("solo_gem.html", gem)
+		return render_template("solo_gem.html", gem = gem, reviews = reviews)
 
 @app.route("/login", methods=["GET", "POST"])
 def login():

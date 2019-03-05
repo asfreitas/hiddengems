@@ -21,10 +21,14 @@
 	{% for gem in gems %}
 		<section>
 			<header>
-				<a href="{{url_for('gem_solo', gemId = gem.id)}}">
+				<a href="{{url_for('gem_solo', gemId = gem.idGems)}}">
 					<h2>{{ gem.name }}</h2>
 				</a>
-				<span>{{ gem.discoveredByUsername }}</span>
+				{% if (gem.discoveredByUsername == None) %}
+					<p>Found By: A former Hidden Gems User</p>
+				{% else %}
+					<p>Found By: {{ gem.discoveredByUsername }}</p>
+				{% endif %}
 			</header>
 			<p>{{ gem.description }}</p>
 		</section>

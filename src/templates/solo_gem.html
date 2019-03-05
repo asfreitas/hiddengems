@@ -6,9 +6,21 @@
 	<section>
 		<header>
 			<h2>{{ gem.name }}</h2>
-			<span>{{ gem.discoveredByUsername }}</span>
+			{% if (gem.discoveredByUsername == None) %}
+				<p>Found By: A former Hidden Gems User</p>
+			{% else %}
+				<p>Found By: {{ gem.discoveredByUsername }}</p>
+			{% endif %}
+			<p>⭐{{ gem.stars }}</p>
 		</header>
 		<p>{{ gem.description }}</p>
+		<ul>
+			{% for review in reviews %}
+				<li>
+					On {{ review.created }} {{ review.username }} said {{ review.contents }}
+				</li>
+			{% endfor %}
+		</ul>
 	</section>
 </main>
 
