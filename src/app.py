@@ -19,7 +19,7 @@ app.secret_key = "hiddengems"
 app.config['MYSQL_DATABASE_USER'] = 'cs340_brassev'
 app.config['MYSQL_DATABASE_PASSWORD'] = '0994'
 app.config['MYSQL_DATABASE_DB'] = 'cs340_brassev'
-app.config['MYSQL_DATABASE_HOST'] = 'classmysql.engr.oregonstate.edu'
+app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
 
 
@@ -98,7 +98,7 @@ def gems():
 	dbconn = mysql.connect()
 	cursor = dbconn.cursor(pymysql.cursors.DictCursor)
 	# Information for displaying all gems
-	cursor.execute("""
+	query = """
 SELECT
     `Gems`.`idGems`,
     `Gems`.`name`,
@@ -112,7 +112,28 @@ FROM
     `Cities` ON `Gems`.`location` = `Cities`.`idCities`
         LEFT JOIN
     `Users` ON `Gems`.`created_by` = `Users`.`idUsers`
-		""")
+	"""
+	args = ()
+	filters = []
+
+	filter_values = {
+		'city': request.args.get('city', default='', type=int),
+		'type': request.args.get('type', default='')
+	}
+	if (filter_values['city'] != ''):
+		filters.append('`Gems`.`location` = %s')
+		args += (filter_values['city'], )
+
+	if (filter_values['type'] != ''):
+		filters.append('`Gems`.`type` = %s')
+		args += (filter_values['type'], )
+
+	if (len(filters) > 0):
+		query += 'WHERE '
+		query += ' and '.join(filters)
+		print(query)
+
+	cursor.execute(query, args)
 	gems = cursor.fetchall()
 
 	# Information for filtering / creating a gem
@@ -124,9 +145,17 @@ FROM
 	""")
 	cities = cursor.fetchall()
 
+	cursor.execute("""
+SELECT DISTINCT
+    `type`
+FROM
+    `Gems`;
+	""")
+	types = cursor.fetchall()
+
 
 	dbconn.close()
-	return render_template("gems.html", gems = gems, cities = cities)
+	return render_template("gems.html", gems = gems, cities = cities, types = types, filter_values = filter_values)
 
 @app.route("/create-gem")
 def create_gem():

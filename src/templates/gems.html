@@ -6,25 +6,48 @@
 	<header>
 		<h1>Gems:</h1>
 		<form action="{{url_for('gems')}}">
-			<select name="city">
-				<option value></option>
-				{% for city in cities %}
-					<option value="{{ city.idCities }}">
-						{{ city.name }}
-					</option>
-				{% endfor %}
-			</select>
+			<h2>Filters:</h2>
+			<label>
+				City:
+				<select name="city">
+					<option value></option>
+					{% for city in cities %}
+						<option value="{{ city.idCities }}"
+							{% if (filter_values['city'] == city.idCities) %}
+								selected
+							{% endif %}
+						>
+							{{ city.name }}
+						</option>
+					{% endfor %}
+				</select>
+			</label><br />
+			<label>
+				Type:
+				<select name="type">
+					<option value></option>
+					{% for type in types %}
+						<option value="{{ type.type }}"
+							{% if (filter_values['type'] == type.type) %}
+								selected
+							{% endif %}
+						>
+							{{ type.type }}
+						</option>
+					{% endfor %}
+				</select>
+			</label><br />
 			<input type="submit" value="Apply Filters" />
 			<a href="{{url_for('gems')}}">Reset Filters</a>
 		</form>
 	</header>
 	{% for gem in gems %}
-		<section>
+		<section class="gem">
 			<header>
 				<a href="{{url_for('gem_solo', gemId = gem.idGems)}}">
 					<h2>{{ gem.name }}</h2>
-				</a>
-				{% if (gem.discoveredByUsername == None) %}
+				</a> - {{ gem.type }}
+				{% if gem.discoveredByUsername == None %}
 					<p>Found By: A former Hidden Gems User</p>
 				{% else %}
 					<p>Found By: {{ gem.discoveredByUsername }}</p>
