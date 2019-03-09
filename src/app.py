@@ -157,9 +157,48 @@ FROM
 	dbconn.close()
 	return render_template("gems.html", gems = gems, cities = cities, types = types, filter_values = filter_values)
 
-@app.route("/create-gem")
+@app.route("/create-gem", methods = ['GET', 'POST'])
 def create_gem():
-	return
+	dbconn = mysql.connect()
+	cursor = dbconn.cursor(pymysql.cursors.DictCursor)
+
+	if (request.method == 'POST'):
+		cursor.execute("SELECT `idUsers` FROM `Users` WHERE `username` = %s", (session['username']))
+		row = cursor.fetchone()
+		userId = row['idUsers']
+
+		query = """
+INSERT INTO `Gems` (`address`, `type`, `name`, `description`, `created_by`, `location`)
+	SELECT %s, %s, %s, %s, `idUsers`, %s FROM `Users` WHERE
+	`username` = '%s';
+		"""
+
+		print(query)
+		affectedRows = cursor.execute(query, (request.form['address'], request.form['type'], request.form['title'], request.form['description'], request.form['city'], userId))
+		dbconn.commit();
+
+		if (affectedRows == 1):
+			query = """
+	SELECT `idGems` FROM `Gems` WHERE `address` = %s and `type` = %s and `name` = %s and `description` = %s and `created_by` = %s and `location` = %s
+			"""
+			numResults = cursor.execute(query, (request.form['address'], request.form['type'], request.form['title'], request.form['description'], userId, request.form['city']))
+			row = cursor.fetchone()
+			newGemId = row['idGems']
+			return redirect(url_for('gem_solo', gemId = newGemId))
+		else:
+			return str(affectedRows)
+	else:
+		if ('username' in session):
+			cursor.execute("""
+		SELECT
+		    `idCities`, `name`
+		FROM
+		    `Cities`;
+			""")
+			cities = cursor.fetchall()
+			return render_template('create_gem.html', cities = cities)
+		else:
+			return render_template('error.html', message = "You need to be logged in to create a gem.")
 
 @app.route("/gem/<gemId>")
 def gem_solo(gemId):
