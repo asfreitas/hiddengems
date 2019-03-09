@@ -169,12 +169,16 @@ def create_gem():
 
 		query = """
 INSERT INTO `Gems` (`address`, `type`, `name`, `description`, `created_by`, `location`)
-	SELECT %s, %s, %s, %s, `idUsers`, %s FROM `Users` WHERE
-	`username` = '%s';
+	VALUES (%s, %s, %s, %s, %s, %s)
 		"""
-
-		print(query)
-		affectedRows = cursor.execute(query, (request.form['address'], request.form['type'], request.form['title'], request.form['description'], request.form['city'], userId))
+		affectedRows = cursor.execute(query, (
+			pymysql.escape_string(request.form['address']),
+			pymysql.escape_string(request.form['type']),
+			pymysql.escape_string(request.form['title']),
+			pymysql.escape_string(request.form['description']),
+			pymysql.escape_string(str(userId)),
+			pymysql.escape_string(request.form['city']))
+		)
 		dbconn.commit();
 
 		if (affectedRows == 1):
@@ -186,7 +190,7 @@ INSERT INTO `Gems` (`address`, `type`, `name`, `description`, `created_by`, `loc
 			newGemId = row['idGems']
 			return redirect(url_for('gem_solo', gemId = newGemId))
 		else:
-			return str(affectedRows)
+			return render_template('error.html', message = "We were unable to create the gem.")
 	else:
 		if ('username' in session):
 			cursor.execute("""
