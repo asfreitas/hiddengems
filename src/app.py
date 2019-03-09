@@ -193,7 +193,7 @@ FROM
 def create_gem(gemId):
 	dbconn = mysql.connect()
 	cursor = dbconn.cursor(pymysql.cursors.DictCursor)
-	
+
 	cursor.execute("SELECT `idUsers` FROM `Users` WHERE `username` = %s", (session['username']))
 	row = cursor.fetchone()
 	userId = row['idUsers']
@@ -201,7 +201,7 @@ def create_gem(gemId):
 	print(str(gemId))
 
 	if (request.method == 'POST'):
-		
+		query = ""
 		args = (
 			pymysql.escape_string(request.form['address']),
 			pymysql.escape_string(request.form['type']),
@@ -210,8 +210,6 @@ def create_gem(gemId):
 			pymysql.escape_string(str(userId)),
 			pymysql.escape_string(request.form['city'])
 		)
-
-		query = ""
 		if (gemId != -1):
 			# Check if the user created the gem or not
 			cursor.execute("SELECT `created_by` FROM `Gems` WHERE `idGems` = %s", (gemId))
@@ -219,11 +217,11 @@ def create_gem(gemId):
 			if (row['created_by'] != userId):
 				return render_template('error.html', message = "Only the creator of a gem may edit it.")
 
-
 			query = """
-UPDATE `Gems` SET `address` = %s, `type` = %s, `name` = %s, `description` = %s, `created_by` = %s, `location` = %s WHERE `idGems` = %s
+UPDATE `Gems` SET `address` = %s, `type` = %s, `name` = %s, `description` = %s, `created_by` = %s, `location` = %s
+	WHERE `idGems` = %s
 			"""
-			args += (str(gemId), )
+			args += (gemId, )
 		else:
 			query = """
 INSERT INTO `Gems` (`address`, `type`, `name`, `description`, `created_by`, `location`)
