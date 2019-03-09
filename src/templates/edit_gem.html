@@ -1,0 +1,89 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+<main>
+	<h1>
+		{% if (gem != False) %}
+			Update
+		{% else %}
+			Create
+		{% endif %}
+		a Gem
+	</h1>
+	<form action="{{ url_for('create_gem') }}" method="post">
+		<table style="width: 100%;">
+			<tr>
+				<td>
+					<label for="title">Title</label>
+				</td>
+				<td>
+					<input type="text" name="title"
+						{% if (gem != False) %}
+							value="{{ gem.name }}"
+						{% endif %}
+					/>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<label for="type">Type</label>
+				</td>
+				<td>
+					<input type="text" name="type"
+						{% if (gem != False) %}
+							value="{{ gem.type }}"
+						{% endif %}
+					/>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<label for="description">Description</label>
+				</td>
+				<td>
+					<!-- Unfortunately, the following line needs to have no whitespace because it shows up in the textarea -->
+					<textarea name="description">{% if (gem != False) %}{{ gem.description }}{% endif %}</textarea>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<label for="address">Address</label>
+				</td>
+				<td>
+					<input type="text" name="address"
+						{% if (gem != False) %}
+							value="{{ gem.address }}"
+						{% endif %}
+					/>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<label for="city">City</label>
+				</td>
+				<td>
+					<select name="city">
+						{% for city in cities %}
+							<option value="{{ city.idCities }}"
+								{% if (gem != False and city.idCities == gem.location) %}
+									selected
+								{% endif %}
+							>
+								{{ city.name }}
+							</option>
+						{% endfor %}
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td>
+					<input type="submit" value="{% if (gem != False) %}Update{% else %}Create{% endif %}">
+				</td>
+			</tr>
+		</table>
+	</form>
+</main>
+
+{% endblock %}

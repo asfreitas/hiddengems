@@ -157,9 +157,81 @@ FROM
 	dbconn.close()
 	return render_template("gems.html", gems = gems, cities = cities, types = types, filter_values = filter_values)
 
-@app.route("/create-gem")
-def create_gem():
-	return
+@app.route("/edit-gem", methods = ['GET', 'POST'], defaults = {'gemId': -1})
+@app.route("/edit-gem/<gemId>", methods = ['GET', 'POST'])
+def create_gem(gemId):
+	dbconn = mysql.connect()
+	cursor = dbconn.cursor(pymysql.cursors.DictCursor)
+	
+	cursor.execute("SELECT `idUsers` FROM `Users` WHERE `username` = %s", (session['username']))
+	row = cursor.fetchone()
+	userId = row['idUsers']
+
+	if (request.method == 'POST'):
+
+		args = (
+			pymysql.escape_string(request.form['address']),
+			pymysql.escape_string(request.form['type']),
+			pymysql.escape_string(request.form['title']),
+			pymysql.escape_string(request.form['description']),
+			pymysql.escape_string(str(userId)),
+			pymysql.escape_string(request.form['city'])
+		)
+
+		query = ""
+		if (gemId != -1):
+			# Check if the user created the gem or not
+			cursor.execute("SELECT `created_by` FROM `Gems` WHERE `idGems` = %s", (gemId))
+			row = cursor.fetchone()
+			if (row['create_by'] != userId):
+				return render_template('error.html', message = "Only the creator of a gem may edit it.")
+
+
+			query = """
+UPDATE `Gems` SET `address` = %s, `type` = %s, `name` = %s, `description` = %s, `created_by` = %s, `location` = %s)
+	WHERE `idGems` = %s
+			"""
+			args += (str(gemId), )
+		else:
+			query = """
+INSERT INTO `Gems` (`address`, `type`, `name`, `description`, `created_by`, `location`)
+	VALUES (%s, %s, %s, %s, %s, %s)
+			"""
+
+		affectedRows = cursor.execute(query, args)
+		dbconn.commit();
+
+		if (affectedRows == 1):
+			query = """
+	SELECT `idGems` FROM `Gems` WHERE `address` = %s and `type` = %s and `name` = %s and `description` = %s and `created_by` = %s and `location` = %s
+			"""
+			numResults = cursor.execute(query, (request.form['address'], request.form['type'], request.form['title'], request.form['description'], userId, request.form['city']))
+			row = cursor.fetchone()
+			newGemId = row['idGems']
+			return redirect(url_for('gem_solo', gemId = newGemId))
+		else:
+			return render_template('error.html', message = "We were unable to create / edit the gem.")
+	else:
+		if ('username' in session):
+			cursor.execute("""
+		SELECT
+		    `idCities`, `name`
+		FROM
+		    `Cities`;
+			""")
+			cities = cursor.fetchall()
+
+			gem = False
+			if (gemId != -1):
+				# Check if the user created the gem or not
+				cursor.execute("SELECT * FROM `Gems` WHERE `idGems` = %s", (gemId))
+				gem = cursor.fetchone()
+				if (gem['created_by'] != userId):
+					return render_template('error.html', message = "Only the creator of a gem may edit it.")
+
+			return render_template('edit_gem.html', cities = cities, gem = gem)
+		else:
+			return render_template('error.html', message = "You need to be logged in to create a gem.")
 
 @app.route("/gem/<gemId>")
 def gem_solo(gemId):
