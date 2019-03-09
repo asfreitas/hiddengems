@@ -157,28 +157,48 @@ FROM
 	dbconn.close()
 	return render_template("gems.html", gems = gems, cities = cities, types = types, filter_values = filter_values)
 
-@app.route("/create-gem", methods = ['GET', 'POST'])
-def create_gem():
+@app.route("/edit-gem", methods = ['GET', 'POST'], defaults = {'gemId': -1})
+@app.route("/edit-gem/<gemId>", methods = ['GET', 'POST'])
+def create_gem(gemId):
 	dbconn = mysql.connect()
 	cursor = dbconn.cursor(pymysql.cursors.DictCursor)
+	
+	cursor.execute("SELECT `idUsers` FROM `Users` WHERE `username` = %s", (session['username']))
+	row = cursor.fetchone()
+	userId = row['idUsers']
 
 	if (request.method == 'POST'):
-		cursor.execute("SELECT `idUsers` FROM `Users` WHERE `username` = %s", (session['username']))
-		row = cursor.fetchone()
-		userId = row['idUsers']
 
-		query = """
-INSERT INTO `Gems` (`address`, `type`, `name`, `description`, `created_by`, `location`)
-	VALUES (%s, %s, %s, %s, %s, %s)
-		"""
-		affectedRows = cursor.execute(query, (
+		args = (
 			pymysql.escape_string(request.form['address']),
 			pymysql.escape_string(request.form['type']),
 			pymysql.escape_string(request.form['title']),
 			pymysql.escape_string(request.form['description']),
 			pymysql.escape_string(str(userId)),
-			pymysql.escape_string(request.form['city']))
+			pymysql.escape_string(request.form['city'])
 		)
+
+		query = ""
+		if (gemId != -1):
+			# Check if the user created the gem or not
+			cursor.execute("SELECT `created_by` FROM `Gems` WHERE `idGems` = %s", (gemId))
+			row = cursor.fetchone()
+			if (row['create_by'] != userId):
+				return render_template('error.html', message = "Only the creator of a gem may edit it.")
+
+
+			query = """
+UPDATE `Gems` SET `address` = %s, `type` = %s, `name` = %s, `description` = %s, `created_by` = %s, `location` = %s)
+	WHERE `idGems` = %s
+			"""
+			args += (str(gemId), )
+		else:
+			query = """
+INSERT INTO `Gems` (`address`, `type`, `name`, `description`, `created_by`, `location`)
+	VALUES (%s, %s, %s, %s, %s, %s)
+			"""
+
+		affectedRows = cursor.execute(query, args)
 		dbconn.commit();
 
 		if (affectedRows == 1):
@@ -190,7 +210,7 @@ INSERT INTO `Gems` (`address`, `type`, `name`, `description`, `created_by`, `loc
 			newGemId = row['idGems']
 			return redirect(url_for('gem_solo', gemId = newGemId))
 		else:
-			return render_template('error.html', message = "We were unable to create the gem.")
+			return render_template('error.html', message = "We were unable to create / edit the gem.")
 	else:
 		if ('username' in session):
 			cursor.execute("""
@@ -200,7 +220,16 @@ INSERT INTO `Gems` (`address`, `type`, `name`, `description`, `created_by`, `loc
 		    `Cities`;
 			""")
 			cities = cursor.fetchall()
-			return render_template('create_gem.html', cities = cities)
+
+			gem = False
+			if (gemId != -1):
+				# Check if the user created the gem or not
+				cursor.execute("SELECT * FROM `Gems` WHERE `idGems` = %s", (gemId))
+				gem = cursor.fetchone()
+				if (gem['created_by'] != userId):
+					return render_template('error.html', message = "Only the creator of a gem may edit it.")
+
+			return render_template('edit_gem.html', cities = cities, gem = gem)
 		else:
 			return render_template('error.html', message = "You need to be logged in to create a gem.")
 

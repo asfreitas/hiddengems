@@ -6,6 +6,9 @@
 	<section>
 		<header>
 			<h2>{{ gem.name }}</h2>
+			{% if ('username' in session and gem.discoveredByUsername == session['username']) %}
+				<a href="{{ url_for('create_gem', gemId = gem.idGems) }}">Edit this Gem</a>
+			{% endif %}
 			{% if (gem.discoveredByUsername == None) %}
 				<p>Found By: A former Hidden Gems User</p>
 			{% else %}
