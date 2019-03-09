@@ -16,10 +16,10 @@ app.secret_key = "hiddengems"
 
 #MYSQL: you'll have to change these when you want to use your
 # own MYSQL database on the oregon state servers
-app.config['MYSQL_DATABASE_USER'] = 'cs340_brassev'
-app.config['MYSQL_DATABASE_PASSWORD'] = '0994'
-app.config['MYSQL_DATABASE_DB'] = 'cs340_brassev'
-app.config['MYSQL_DATABASE_HOST'] = 'localhost'
+app.config['MYSQL_DATABASE_USER'] = 'cs340_freitand'
+app.config['MYSQL_DATABASE_PASSWORD'] = '3048'
+app.config['MYSQL_DATABASE_DB'] = 'cs340_freitand'
+app.config['MYSQL_DATABASE_HOST'] = 'classmysql.engr.oregonstate.edu'
 mysql.init_app(app)
 
 
