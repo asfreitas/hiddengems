@@ -3,29 +3,14 @@
 
 {% block body %}
 
-<h5><strong>City Table</strong></h5>
-
-<table>
-	<tr>
-	<th>ID</th>
-	<th>City name</th>
-	<th>Latitude</th>
-	<th>Longitude</th>
-	<th>State</th>
-	<th>Country</th>
-</tr>
-	<tr>
-		<td>1</td>
-	</tr>
-	<tr>
-		<td>2</td>
-	</tr>
-</table>
-
-
-
-</table><p>
-
+<h3>Add new cities to Hidden Gems</h3>
+{% with messages = get_flashed_messages() %}
+	{% if messages %}
+	 	{% for message in messages %}
+	 	 <h5>{{ message }}</h5>
+ 	 {% endfor %}
+ 	{% endif %}
+{% endwith %}
 <form action="#" method="post"><br>
 	City Name
 	<input type="text" name = "city"><br>

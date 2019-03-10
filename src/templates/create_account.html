@@ -7,23 +7,6 @@
 
 
 
-<table>
-	<tr>
-	<th>ID</th>
-	<th>User Name</th>
-	<th>Password</th>
-	<th>Hometown</th>
-</tr>
-	<tr>
-		<td>1</td>
-	</tr>
-	<tr>
-		<td>2</td>
-	</tr>
-</table>
-
-
-
 </table><p>
 <h3>Create account</h3>
 <form action="{{url_for('create_account')}}" method="post"><br>
@@ -31,8 +14,18 @@
 	<input type="text" name="user"><br>
 	Password
 	<input type="password" name="password"><br>
-	Hometown
-	<input type="text" name="hometown"><br>
+
+
+ <select name="city">
+ 	<option value="#" selected="selected">Select City</option>
+ {% for item in cities %}
+ 
+  <option value = "{{ item.idCities }}">{{ item.name }}</option>
+
+{% endfor %}
+
+ </select><br>
+
 
  <button type="submit">Submit</button> 
 

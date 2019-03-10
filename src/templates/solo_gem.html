@@ -9,6 +9,9 @@
 			{% if ('username' in session and gem.discoveredByUsername == session['username']) %}
 				<a href="{{ url_for('create_gem', gemId = gem.idGems) }}">Edit this Gem</a>
 			{% endif %}
+			{% if ('username' in session and gem.discoveredByUsername == session['username']) %}
+				<a href="{{ url_for('delete_gem', gemId = gem.idGems) }}">Delete this Gem</a>
+			{% endif %}
 			{% if (gem.discoveredByUsername == None) %}
 				<p>Found By: A former Hidden Gems User</p>
 			{% else %}
@@ -23,7 +26,12 @@
 					On {{ review.created }} {{ review.username }} said {{ review.contents }}
 				</li>
 			{% endfor %}
-		</ul>
+		</ul><p>
+		<h3> Add a new review </h3>
+		<form id="review" method="POST" action="{{url_for('create_review', gemId = gem.idGems) }}">
+			<textarea form="review" name="reviewtext" rows="10" cols="50"></textarea><br>
+			<button type="submit">Submit</button> 
+			</form>
 	</section>
 </main>
 

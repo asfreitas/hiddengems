@@ -11,7 +11,7 @@
 		{% endif %}
 		a Gem
 	</h1>
-	<form action="{{ url_for('create_gem') }}" method="post">
+	<form action="{{ url_for('create_gem', gemId = gem.idGems) }}" method="post">
 		<table style="width: 100%;">
 			<tr>
 				<td>

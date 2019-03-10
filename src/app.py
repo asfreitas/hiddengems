@@ -1,10 +1,10 @@
 #import os
 #import sys
 #sys.path.insert(0, '/home/vc7mi9ics39z/public_html/cgi-bin/myenv/lib/python3.4/site-packages')
-from flask import Flask, render_template, url_for, request, url_for, session, logging, redirect
+from flask import Flask, flash, render_template, url_for, request, url_for, session, logging, redirect
 from flaskext.mysql import MySQL
 import pymysql
-
+from datetime import datetime
 app = Flask(__name__)
 
 
@@ -22,6 +22,15 @@ app.config['MYSQL_DATABASE_DB'] = 'cs340_freitand'
 app.config['MYSQL_DATABASE_HOST'] = 'classmysql.engr.oregonstate.edu'
 mysql.init_app(app)
 
+#get the user id from sessions
+def get_user_id():
+	conn = mysql.connect()
+	cursor = conn.cursor(pymysql.cursors.DictCursor)
+
+	cursor.execute("SELECT idUsers FROM Users WHERE username = %s", (session['username']))
+	username = cursor.fetchone()
+	conn.close()
+	return username['idUsers']
 
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -45,19 +54,30 @@ def index():
 
 @app.route("/add-city", methods=["GET", "POST"])
 def add_city():
+
+	dbconn = mysql.connect()
+	cursor = dbconn.cursor(pymysql.cursors.DictCursor)
+
+	cursor.execute("SELECT name FROM Cities")
+	cities = cursor.fetchall()
+
 	if request.method == "POST":
 		city = request.form["city"]
 		latitude = request.form["latitude"]
 		longitude = request.form["longitude"]
 		state = request.form["state"]
 		country = request.form["country"]
+		for x in cities:
+			if city == x['name']:
+				flash('Your city is already in Hidden Gems')
+				return render_template("add_city.html")
+
 
 
 		dbconn = mysql.connect()
-		cityDBCursor = dbconn.cursor(pymysql.cursors.DictCursor)
+		cursor = dbconn.cursor(pymysql.cursors.DictCursor)
 		insertQuery = "INSERT INTO Cities (name, latitude, longitude, state, country) VALUES (%s, %s, %s, %s, %s)"
 		cityInfo = (city, latitude, longitude, state, country)
-		cursor = dbconn.cursor()
 		cursor.execute(insertQuery, cityInfo)
 		dbconn.commit()
 		dbconn.close()
@@ -71,17 +91,16 @@ def reviews():
 @app.route("/create-account", methods=["GET", "POST"])
 def create_account():
 	dbconn = mysql.connect()
+	cursor = dbconn.cursor(pymysql.cursors.DictCursor)
+	cursor.execute("SELECT idCities, name FROM Cities", args=None)
+	cities = cursor.fetchall()
 	if request.method == "POST":
 		user = request.form["user"]
 		password = request.form["password"]
 		hometown = request.form["hometown"]
+
 		#connect to database and insert row
 
-		userDBCursor = dbconn.cursor(pymysql.cursors.DictCursor)
-		hometownCursor = dbconn.cursor(pymysql.cursors.DictCursor)
-		cityIDQuery = "SELECT idCities FROM Cities WHERE name = %s"
-		hometownCursor.execute(cityIDQuery, hometown)
-		hometownRow = hometownCursor.fetchone()
 		# get cityid from row received from DB
 		hometown = hometownRow["idCities"]
 		insertQuery = "INSERT INTO Users (username, home_city, password) VALUES (%s, %s, %s)"
@@ -91,7 +110,7 @@ def create_account():
 		dbconn.commit()
 		dbconn.close()
 
-	return render_template("create_account.html")
+	return render_template("create_account.html", cities=cities)
 
 @app.route("/gems")
 def gems():
@@ -167,6 +186,8 @@ def create_gem(gemId):
 	row = cursor.fetchone()
 	userId = row['idUsers']
 
+	print(str(gemId))
+
 	if (request.method == 'POST'):
 
 		args = (
@@ -183,13 +204,12 @@ def create_gem(gemId):
 			# Check if the user created the gem or not
 			cursor.execute("SELECT `created_by` FROM `Gems` WHERE `idGems` = %s", (gemId))
 			row = cursor.fetchone()
-			if (row['create_by'] != userId):
+			if (row['created_by'] != userId):
 				return render_template('error.html', message = "Only the creator of a gem may edit it.")
 
 
 			query = """
-UPDATE `Gems` SET `address` = %s, `type` = %s, `name` = %s, `description` = %s, `created_by` = %s, `location` = %s)
-	WHERE `idGems` = %s
+UPDATE `Gems` SET `address` = %s, `type` = %s, `name` = %s, `description` = %s, `created_by` = %s, `location` = %s WHERE `idGems` = %s
 			"""
 			args += (str(gemId), )
 		else:
@@ -297,7 +317,6 @@ def login():
 				session['username'] = username
 				app.logger.info("Logged in")
 
-
 		dbconn.close()
 
 	return render_template("login.html")
@@ -307,6 +326,40 @@ def logout():
 	if session["logged_in"] == True:
 		session.clear()
 	return redirect(url_for("index"))
+
+@app.route("/delete/<gemId>", methods=["POST", "GET"])
+def delete_gem(gemId):
+	conn = mysql.connect()
+	cursor = conn.cursor(pymysql.cursors.DictCursor)
+	cursor.execute("DELETE FROM Gems WHERE idGems = %s", (gemId))
+	conn.commit()
+
+	cursor.execute("DELETE FROM Favorites WHERE gem = %s", (gemId))
+	conn.commit()
+	conn.close()
+	return redirect(url_for("index"))
+
+@app.route("/makereview/<gemId>", methods=["POST"])
+def create_review(gemId):
+	conn = mysql.connect()
+	cursor = conn.cursor(pymysql.cursors.DictCursor)
+	#I got this from here https://www.tutorialspoint.com/How-to-insert-date-object-in-MySQL-using-Python
+	now = datetime.now()
+	formatted_date = now.strftime('%Y-%m-%d %H:%M:%S')
+	review = request.form["reviewtext"]
+	userid = get_user_id()
+	print(userid)
+	data = (formatted_date, review, userid, gemId)
+	cursor.execute("INSERT INTO Reviews (created, contents, written_by, gem) VALUES (%s,%s,%s,%s)",data)
+	conn.commit()
+	conn.close()
+	return redirect(url_for("gem_solo", gemId=gemId))
+
+
+@app.route("/profile")
+def profile():
+	return render_template("profile.html")
+
 
 
 if __name__ == '__main__':
