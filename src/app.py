@@ -92,17 +92,19 @@ def reviews():
 def create_account():
 	dbconn = mysql.connect()
 	cursor = dbconn.cursor(pymysql.cursors.DictCursor)
-	cursor.execute("SELECT idCities, name FROM Cities", args=None)
+	cursor.execute("SELECT name FROM Cities", args=None)
 	cities = cursor.fetchall()
+
 	if request.method == "POST":
+
 		user = request.form["user"]
 		password = request.form["password"]
-		hometown = request.form["hometown"]
-
+		hometown = request.form["city"]
+		print(hometown)
 		#connect to database and insert row
-
+		cursor.execute("SELECT idCities FROM Cities WHERE name = %s", (hometown))
+		city = cursor.fetchone()
 		# get cityid from row received from DB
-		hometown = hometownRow["idCities"]
 		insertQuery = "INSERT INTO Users (username, home_city, password) VALUES (%s, %s, %s)"
 		userInfo = (user, hometown, password)
 		cursor = dbconn.cursor()
@@ -189,7 +191,7 @@ def create_gem(gemId):
 	print(str(gemId))
 
 	if (request.method == 'POST'):
-
+		
 		args = (
 			pymysql.escape_string(request.form['address']),
 			pymysql.escape_string(request.form['type']),
