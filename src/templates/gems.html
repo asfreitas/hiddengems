@@ -47,21 +47,39 @@
 		You must be logged in to make a new gem. Login by clicking <a href="{{ url_for('login') }}"">here</a>.
 		{% endif %}
 	</header>
-	{% for gem in gems %}
-		<section class="gem">
-			<header>
-				<a href="{{url_for('gem_solo', gemId = gem.idGems)}}">
-					<h2>{{ gem.name }}</h2>
-				</a> - {{ gem.type }}
-				{% if gem.discoveredByUsername == None %}
-					<p>Found By: A former Hidden Gems User</p>
-				{% else %}
-					<p>Found By: {{ gem.discoveredByUsername }}</p>
-				{% endif %}
-			</header>
-			<p>{{ gem.description }}</p>
-		</section>
+
+
+<!-- Display gems in cars -->
+
+	{% for gem in gems | slice(3) %}
+		<div class="row">
+			{% for item in gem %}
+			<div class="col-sm-6">
+				<div class="card text-white bg-info mb-3">
+					<h4 class="card-header">
+						<a style="color: white" href="{{url_for('gem_solo', gemId = item.idGems)}}">{{ item.name }}</a>
+					</h4>
+					<div class="card-body">
+						<h5 class="card-title">
+						{% if item.discoveredByUsername == None %}
+						Found By: A former Hidden Gems User
+						{% else %}
+						Found By: {{ item.discoveredByUsername }}
+						{% endif %}
+
+						</h5>
+						<h6 class="card-subtitle mb-2 text-muted"> {{ item.type }}</h6>
+						<p class="card-text"> {{ item.description }}</p>
+
+					</div>
+				</div>
+			</div>
+			{% endfor %}
+		</div>
+
 	{% endfor %}
+
+	
 </main>
 
 {% endblock %}
