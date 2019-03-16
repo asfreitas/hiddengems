@@ -6,30 +6,46 @@
 {% block body %}
 
 
+<body class="text-center">
+	<div class="d-flex h-100">
+	<div class="row align-self-center w-100">
+	<div class="col-3 mx-auto">
+			<form class="account" action="{{url_for('create_account')}}" method="post">
+		<div class="jumbotron">
+			<h1>Sign up</h1>
+			<div class="form-group">
+			<label for="username">Username</label>
+			<div class="">
+				<input id="username" type="text" class="form-control" name="username" placeholder="Username">
+			</div>
+		</div>
+		<div class="form-group ">
+			<label for="password">Password</label>
+			<div class="">
+			<input type="password" id="password" name="password"
+			class="form-control" placeholder="Password" >
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="city">Select a Current City</label>
+			 <select multiple class="form-control" id="city" name="city">
+			 	<option value="#" selected="selected">Select City</option>
+				 {% for item in cities %}
+				 
+				  <option value = "{{ item.idCities }}">{{ item.name }}</option>
 
-</table><p>
-<h3>Create account</h3>
-<form action="{{url_for('create_account')}}" method="post"><br>
-	Username
-	<input type="text" name="user"><br>
-	Password
-	<input type="password" name="password"><br>
+				{% endfor %}
 
+			 </select><br>
+		 </div>
 
- <select name="city">
- 	<option value="#" selected="selected">Select City</option>
- {% for item in cities %}
- 
-  <option value = "{{ item.idCities }}">{{ item.name }}</option>
-
-{% endfor %}
-
- </select><br>
-
-
- <button type="submit">Submit</button> 
-
-</form>
-
+			 <button class="btn btn-primary" type="submit">Submit</button> 
+		</div>
+			</form>
+		</div>
+	</div>
+	</div>
+	</div>
+</body>
 
 {% endblock %}

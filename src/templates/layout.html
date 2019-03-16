@@ -8,13 +8,13 @@
 </head>
 <body>
 	<nav class="navbar navbar-expand-md navbar-dark bg-dark ">
-	<ul class="navbar-nav mr-auto mt-2 my-lg-0">
+	<a class="navbar-brand" href="#">Hidden Gems</a>
+	<ul class="navbar-nav mx-auto mt-2 my-lg-0">
 		{% for func, title in {
 			'index': 'Home',
 			'create_account': 'Create an Account',
 			'gems': 'Explore',
 			'add_city': 'Add City',
-			'login': 'Login',
 			'profile': 'Profile'
 		}.items() %}
 			<li class="nav-item">
@@ -30,14 +30,14 @@
 	</ul>
 	<div>
 		<ul class="nav navbar-nav ml-auto text-white">
-			<li class="nav-item" style="padding: .5rem 1rem;">Hello
+			<li class="nav-item" style="padding: .5rem .2rem;">
 				{% if 'username' in session %}
-					{{ session['username'] }}
+				Hello	{{ session['username'] }}
 				{% else %}
-				Guest
+				<a class="nav-link" href="{{ url_for('login') }}">Login</a>
 				{% endif %}
 			</li>
-			<li class="nav-item">
+			<li class="nav-item" style="padding: .5rem 1rem;">
 				<a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
 			</li>
 		</ul>

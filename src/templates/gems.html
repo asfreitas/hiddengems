@@ -36,12 +36,16 @@
 						</option>
 					{% endfor %}
 				</select>
-			</label><br />
+			</label><br/>
 			<input type="submit" value="Apply Filters" />
 			<a href="{{url_for('gems')}}">Reset Filters</a>
 		</form>
-		<br />
+		<br/>
+		{% if logged_in %}
 		Found somewhere cool? Make a <a href="{{ url_for('create_gem') }}">new Gem!</a>
+		{% else %}
+		You must be logged in to make a new gem. Login by clicking <a href="{{ url_for('login') }}"">here</a>.
+		{% endif %}
 	</header>
 	{% for gem in gems %}
 		<section class="gem">

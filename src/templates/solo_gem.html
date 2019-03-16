@@ -27,11 +27,15 @@
 				</li>
 			{% endfor %}
 		</ul><p>
-		<h3> Add a new review </h3>
-		<form id="review" method="POST" action="{{url_for('create_review', gemId = gem.idGems) }}">
-			<textarea form="review" name="reviewtext" rows="10" cols="50"></textarea><br>
-			<button type="submit">Submit</button> 
-			</form>
+			{% if logged_in %}
+					<h3> Add a new review </h3>
+				<form id="review" method="POST" action="{{url_for('create_review', gemId = gem.idGems) }}">
+				<textarea form="review" name="reviewtext" rows="10" cols="50"></textarea><br>
+				<button type="submit">Submit</button> 
+				</form>
+			{% else %}
+				You must be logged in to review gems. You can login by clicking <a href="{{ url_for('login') }}"">here</a>.
+			{% endif %}
 	</section>
 </main>
 
