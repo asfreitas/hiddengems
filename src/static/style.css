@@ -1,0 +1,20 @@
+.gem {
+margin: 1em;
+padding: .3em;
+background-color: #fff;
+border: 1px solid #aaa;
+}
+.gem h2 {
+display: inline-block;
+}
+
+table label {
+	text-align: right;
+	display: block;
+}
+
+.signin .account{
+	vertical-align: middle;
+
+}
+
