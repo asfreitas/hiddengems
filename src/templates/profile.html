@@ -4,6 +4,37 @@
 {% block body %}
 
 
+<body class="text-center">
+<div class="profile_update">
+	<div class="d-flex h-100">
+	<div class="row align-self-center w-100">
+	<div class="mx-auto">
+	<form action="{{url_for('profile_update')}}" method="post">
+		<div class="jumbotron"> 
+			{% if not current_city.name  %}
+				<h3>You haven't told us where your current city is!</h3>
+				{% else %}
+				<h3>You are currently located in: {{ current_city.name }}</h3>
+			{% endif %}
+		
+			<div class="form-group">
+			<label for="city">Select a Current City</label>
+			 <select multiple class="form-control" id="city" name="city">
+			 	<option value="-1" selected="selected">Remove City from Profile</option>
+				 {% for item in cities %}
+				 
+				  <option value = "{{ item.idCities }}">{{ item.name }}</option>
 
+				{% endfor %}
+
+			 </select>
+
+		 </div>
+		 <button class="btn btn-primary" type="submit">Submit</button> 
+		</div>
+
+		</div>
+	</form>
+</div>
 
 {% endblock %}

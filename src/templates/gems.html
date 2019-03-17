@@ -70,14 +70,16 @@
 						</h5>
 						<h6 class="card-subtitle mb-2 text-muted"> {{ item.type }}</h6>
 						<p class="card-text"> {{ item.description }}</p>
-						{% if item.idGems not in user_favorites %}
-						<form action="{{url_for('add_favorite', gemId=item.idGems)}}" method="post">
-							<button type="submit" class="btn btn-success">Favorite</button>
-						</form>
-						{% else %}
-							<form action="{{url_for('remove_favorite', gemId=item.idGems)}}" method="post">
-							<button type="submit" class="btn btn-danger">UnFavorite</button>
-						</form>
+						{% if 'logged_in' in session %}
+								{% if item.idGems not in user_favorites %}
+							<form action="{{url_for('add_favorite', gemId=item.idGems)}}" method="post">
+								<button type="submit" class="btn btn-success">Favorite</button>
+							</form>
+							{% else %}
+								<form action="{{url_for('remove_favorite', gemId=item.idGems)}}" method="post">
+								<button type="submit" class="btn btn-danger">UnFavorite</button>
+							</form>
+							{% endif %}
 						{% endif %}
 					</div>
 				</div>

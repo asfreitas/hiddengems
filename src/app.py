@@ -32,7 +32,7 @@ def get_user_id():
 	conn.close()
 	return username['idUsers']
 
-@app.route("/", methods=["GET", "POST"])
+@app.route("/possiblydelete", methods=["GET", "POST"])
 def index():
 	dbconn = mysql.connect()
 	cityDBCursor = dbconn.cursor(pymysql.cursors.DictCursor)
@@ -114,6 +114,7 @@ def create_account():
 
 	return render_template("create_account.html", cities=cities)
 
+@app.route("/", methods=["GET", "POST"])
 @app.route("/gems")
 def gems():
 	dbconn = mysql.connect()
@@ -178,13 +179,11 @@ FROM
 
 	# get information about favorites from user
 	user_favorites = []
-	if session['logged_in'] == True:
+	if 'logged_in' in session and session['logged_in'] == True:
 		cursor.execute("SELECT gem FROM Favorites WHERE user = %s", (get_user_id()))
 		favorites = cursor.fetchall()
 		for gem in favorites:
 			user_favorites.append(gem['gem'])
-
-
 
 	dbconn.close()
 	return render_template("gems.html", gems = gems, cities = cities, types = types, filter_values = filter_values, user_favorites=user_favorites)
@@ -336,7 +335,7 @@ def login():
 
 @app.route("/logout")
 def logout():
-	if session["logged_in"] == True:
+	if 'logged_in' in session and session["logged_in"] == True:
 		session.clear()
 	return redirect(url_for("index"))
 
@@ -371,7 +370,17 @@ def create_review(gemId):
 
 @app.route("/profile")
 def profile():
-	return render_template("profile.html")
+	userid = get_user_id()
+	dbconn = mysql.connect()
+	cursor = dbconn.cursor(pymysql.cursors.DictCursor)
+	cursor.execute("SELECT name, idCities FROM Cities", args=None)
+	cities = cursor.fetchall()
+
+	cursor.execute("SELECT name FROM Cities INNER JOIN Users ON idCities = home_city WHERE idUsers = %s", (userid))
+	current_city = cursor.fetchone()
+
+	dbconn.close()
+	return render_template("profile.html", cities=cities, current_city=current_city)
 
 @app.route("/addfavorite/<gemId>", methods=["POST"])
 def add_favorite(gemId):
@@ -398,6 +407,26 @@ def remove_favorite(gemId):
 	conn.close()
 
 	return redirect(url_for("gem_solo", gemId=gemId))
+
+@app.route('/profile_update', methods=['POST'])
+def profile_update():
+	cityid = request.form['city']
+	current_city = ''
+	userid = get_user_id()
+	conn = mysql.connect()
+	cursor = conn.cursor(pymysql.cursors.DictCursor)
+	query = 'UPDATE Users SET home_city = %s WHERE idUsers = %s'
+	if cityid == "-1":
+		current_city = None
+	else:
+		current_city = cityid
+
+	data = (current_city, userid)
+	cursor.execute(query,data)
+	conn.commit()
+	conn.close()
+
+	return redirect(url_for('profile'))
 
 
 
