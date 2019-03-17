@@ -27,7 +27,7 @@
 				</li>
 			{% endfor %}
 		</ul><p>
-			{% if logged_in %}
+			{% if session['logged_in'] %}
 					<h3> Add a new review </h3>
 				<form id="review" method="POST" action="{{url_for('create_review', gemId = gem.idGems) }}">
 				<textarea form="review" name="reviewtext" rows="10" cols="50"></textarea><br>

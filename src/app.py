@@ -175,8 +175,19 @@ FROM
 	types = cursor.fetchall()
 
 
+
+	# get information about favorites from user
+	user_favorites = []
+	if session['logged_in'] == True:
+		cursor.execute("SELECT gem FROM Favorites WHERE user = %s", (get_user_id()))
+		favorites = cursor.fetchall()
+		for gem in favorites:
+			user_favorites.append(gem['gem'])
+
+
+
 	dbconn.close()
-	return render_template("gems.html", gems = gems, cities = cities, types = types, filter_values = filter_values)
+	return render_template("gems.html", gems = gems, cities = cities, types = types, filter_values = filter_values, user_favorites=user_favorites)
 
 @app.route("/edit-gem", methods = ['GET', 'POST'], defaults = {'gemId': -1})
 @app.route("/edit-gem/<gemId>", methods = ['GET', 'POST'])
@@ -361,6 +372,32 @@ def create_review(gemId):
 @app.route("/profile")
 def profile():
 	return render_template("profile.html")
+
+@app.route("/addfavorite/<gemId>", methods=["POST"])
+def add_favorite(gemId):
+	userid = get_user_id()
+	conn = mysql.connect()
+	cursor = conn.cursor(pymysql.cursors.DictCursor)
+	query = "INSERT INTO Favorites (user, gem) VALUES (%s,%s)"
+	data = (userid, gemId)
+	cursor.execute(query, data)
+	conn.commit()
+	conn.close()
+	return redirect(url_for("gem_solo", gemId=gemId))
+
+
+@app.route("/removefavorite/<gemId>", methods=["POST"])
+def remove_favorite(gemId):
+	userid = get_user_id()
+	conn = mysql.connect()
+	cursor = conn.cursor(pymysql.cursors.DictCursor)
+	query = "DELETE FROM Favorites WHERE user = %s AND gem = %s"
+	data = (userid, gemId)
+	cursor.execute(query, data)
+	conn.commit()
+	conn.close()
+
+	return redirect(url_for("gem_solo", gemId=gemId))
 
 
 
